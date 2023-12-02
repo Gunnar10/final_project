@@ -8,6 +8,9 @@
 #
 
 library(shiny)
+library(tidyverse)
+
+data <- read_csv("Inland_Fisheries_-_Length_Weight_[ds195].csv")
 
 # Define server logic required to draw a histogram
 function(input, output, session) {
@@ -23,6 +26,10 @@ function(input, output, session) {
              xlab = 'Waiting time to next eruption (in mins)',
              main = 'Histogram of waiting times')
 
+    })
+    
+    output$table <- renderTable({
+      head(data)
     })
 
 }
