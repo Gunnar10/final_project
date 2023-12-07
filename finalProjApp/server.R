@@ -100,26 +100,58 @@ function(input, output, session) {
   
     output$plot <- renderPlot({
       newData <- getData()
-      if (input$reg) {
+      if (input$plotType == "violin" & input$reg) {
+        
           ggplot(newData, aes(x =  name, y = kg, fill = subReg)) +
           labs(
             title = "Violin Plot of Fish Weight by Fish Type",
             x = "Fish Type",
             y = "Weight in kg"
-          ) + geom_violin(trim = FALSE)
+          ) + geom_violin(trim = FALSE) + labs(fill = "Sub Region")
+        
       } else if (input$plotType == "violin") {
+        
         ggplot(newData, aes(x =  name, y = kg)) +
           labs(
             title = "Violin Plot of Fish Weight by Fish Type",
             x = "Fish Type",
             y = "Weight in kg"
           ) + geom_violin(trim = FALSE)
+        
+      } else if (input$plotType == "scatter" & input$area) {
+        
+        ggplot(newData, aes(x = cm, y = kg)) + 
+          labs(title = "Scatter Plot of Weights by Length",
+               x = "Length in cm",
+               y = "Weight in kg") +
+          geom_point(aes(colour = area)) +
+          labs(colour = "Area")
+        
       } else if (input$plotType == "scatter") {
         
+        ggplot(newData, aes(x = cm, y = kg)) + 
+          labs(title = "Scatter Plot of Weights by Length",
+               x = "Length in cm",
+               y = "Weight in kg") +
+          geom_point()
+        
       } else if (input$plotType == "bar") {
+        ggplot(newData, aes(x = name, fill = subReg)) + 
+          labs(title = "Bar Graph of Fish type by Sub Region",
+               x = "Fish Type",
+               y = "Frequency",
+               fill = "Sub Region") + 
+          geom_bar(position = "dodge", colour = "black")
         
       } else if (input$plotType == "hist"){
         
+        ggplot(newData, aes(x = kg)) + 
+          labs(title = "Density plot of Weight for Fish Type",
+               x = "Weight in kg",
+              y = "Frequency") + 
+          geom_histogram(binwidth = input$bin,
+                         colour = "black",
+                         fill = "white")
       }
 
 

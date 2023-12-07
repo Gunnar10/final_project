@@ -23,7 +23,6 @@ dashboardPage(
               fluidRow(
                 box(radioButtons(inputId = "plotType", 
                                  label = "Select the Type of Plot.",
-                                 selected = character(0),
                                  choiceNames = c("Violin Plot", "Histogram", "Scatter Plot", "Stacked Bar"),
                                  choiceValues = c("violin", "hist", "scatter", "bar")),
                     selectInput(inputId = "fish",
@@ -34,6 +33,15 @@ dashboardPage(
                                 ),
                     conditionalPanel(condition = "input.plotType == 'violin'",
                                      checkboxInput("reg", h5("Add Region to Plot"))
+                                     ),
+                    conditionalPanel(condition = "input.plotType == 'hist'",
+                                     sliderInput("bin", "Bin Width", 
+                                                 min = 0,
+                                                 max = 1,
+                                                 value = 0.5)
+                                     ),
+                    conditionalPanel(condition = "input.plotType == 'scatter'",
+                                     checkboxInput("area", h5("Add Area to Plot"))
                                      )
                     ),
                 box(plotOutput("plot"))
