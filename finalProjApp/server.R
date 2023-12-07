@@ -1,5 +1,6 @@
 #Load Packages
 library(shiny)
+library(shinydashboard)
 library(tidyverse)
 library(caret)
 
@@ -69,40 +70,58 @@ fishData <- fishData %>%
                                         WAVE == 6 ~ "nov/dec"))
   ) %>% drop_na()
 
-trainIndex <- createDataPartition(fishData$kg, p = 0.8, list = FALSE)
-fishTrain <- fishData[trainIndex, ]
-fishTest <- fishData[-trainIndex, ]
-
-fit <- train(kg ~ ., data = fishTrain,
-             method = "lm",
-             trControl = trainControl(method = "cv", number = 10))
-fit
-
-pred <- predict(fit, newdata = fishTest)
-postResample(pred,obs = fishTest$kg)
-
-fit2 <- train(kg ~ name + cm + area, data = fishTrain,
-              method = "lm",
-              trControl = trainControl(method = "cv", number = 10))
-
-pred <- predict(fit2, newdata = fishTest)
-postResample(pred,obs = fishTest$kg)
-fit2
-data.frame(t(fit$results), t(fit2$results))
+# trainIndex <- createDataPartition(fishData$kg, p = 0.8, list = FALSE)
+# fishTrain <- fishData[trainIndex, ]
+# fishTest <- fishData[-trainIndex, ]
+# 
+# fit <- train(kg ~ ., data = fishTrain,
+#              method = "lm",
+#              trControl = trainControl(method = "cv", number = 10))
+# fit
+# 
+# pred <- predict(fit, newdata = fishTest)
+# postResample(pred,obs = fishTest$kg)
+# 
+# fit2 <- train(kg ~ name + cm + area, data = fishTrain,
+#               method = "lm",
+#               trControl = trainControl(method = "cv", number = 10))
+# 
+# pred <- predict(fit2, newdata = fishTest)
+# postResample(pred,obs = fishTest$kg)
+# fit2
+# data.frame(t(fit$results), t(fit2$results))
 
 # Define server logic
 function(input, output, session) {
 
-    output$distPlot <- renderPlot({
+  getData <- reactive({
+    newData <- fishData %>% filter(name == input$fish)
+  })
+  
+    output$plot <- renderPlot({
+      newData <- getData()
+      if (input$reg) {
+          ggplot(newData, aes(x =  name, y = kg, fill = subReg)) +
+          labs(
+            title = "Violin Plot of Fish Weight by Fish Type",
+            x = "Fish Type",
+            y = "Weight in kg"
+          ) + geom_violin(trim = FALSE)
+      } else if (input$plotType == "violin") {
+        ggplot(newData, aes(x =  name, y = kg)) +
+          labs(
+            title = "Violin Plot of Fish Weight by Fish Type",
+            x = "Fish Type",
+            y = "Weight in kg"
+          ) + geom_violin(trim = FALSE)
+      } else if (input$plotType == "scatter") {
+        
+      } else if (input$plotType == "bar") {
+        
+      } else if (input$plotType == "hist"){
+        
+      }
 
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white',
-             xlab = 'Waiting time to next eruption (in mins)',
-             main = 'Histogram of waiting times')
 
     })
     
