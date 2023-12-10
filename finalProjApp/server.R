@@ -68,7 +68,7 @@ fishData <- fishData %>%
                                         WAVE == 4 ~ "july/aug",
                                         WAVE == 5 ~ "sept/oct",
                                         WAVE == 6 ~ "nov/dec"))
-  ) %>% drop_na()
+            ) %>% drop_na()
 
 # trainIndex <- createDataPartition(fishData$kg, p = 0.8, list = FALSE)
 # fishTrain <- fishData[trainIndex, ]
@@ -136,11 +136,12 @@ function(input, output, session) {
           geom_point()
         
       } else if (input$plotType == "bar") {
-        ggplot(newData, aes(x = name, fill = subReg)) + 
-          labs(title = "Bar Graph of Fish type by Sub Region",
+        
+        ggplot(newData, aes(x = name, fill = month)) + 
+          labs(title = "Bar Graph of Fish type by Months",
                x = "Fish Type",
                y = "Frequency",
-               fill = "Sub Region") + 
+               fill = "Months") + 
           geom_bar(position = "dodge", colour = "black")
         
       } else if (input$plotType == "hist"){
@@ -153,12 +154,33 @@ function(input, output, session) {
                          colour = "black",
                          fill = "white")
       }
-
-
     })
     
-    output$table <- renderTable({
-      head(fishData)
+    getTableData <- reactive({
+      newData <- fishData %>%  group_by(name) %>% select(name, input$var)
     })
+    
+    getGroupTableData <- reactive({
+      newData <- fishData %>% filter(name == input$fish) %>% group_by(input$group) %>% select(name, input$var)
+    })
+    
+    output$table <- renderDataTable({
+      tableData <- getTableData()
+      groupData <- getGroupTableData()
+      
+      if (input$sumType == "mean") {
+        summary(tableData)
+      } else if (input$sumType == "median") {
+        summary(tableData[ , 2])[3]
+      } else if (input$sumType == "quantiles") {
+        quantile(tableData[ ,2])
+      } else if (input$sumType == "freq") {
+        table(tableData)
+        
+      }
+      
+    })
+    
+    
 
 }
