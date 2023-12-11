@@ -72,15 +72,12 @@ fishData <- fishData %>%
 
 linearModel <- train(kg ~ name + subReg + area + cm + month,
                    data = fishData,
-                   method = "lm",
-                   trControl = trainControl(method = "cv", number = 10)
+                   method = "lm"
                    )
 
 rfModel <- train(name ~ subReg + area + kg + cm + month,
                data = fishData,
-               method = "rf",
-               tuneGrid = data.frame(mtry = c(1:5)),
-               trControl = trainControl(method = "cv", number = 10)
+               method = "rf"
                )
 
 # Define server logic
