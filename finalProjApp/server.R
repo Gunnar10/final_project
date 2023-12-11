@@ -70,34 +70,14 @@ fishData <- fishData %>%
                                         WAVE == 6 ~ "nov/dec"))
             ) %>% drop_na()
 
-# trainIndex <- createDataPartition(fishData$kg, p = 0.8, list = FALSE)
-# fishTrain <- fishData[trainIndex, ]
-# fishTest <- fishData[-trainIndex, ]
-# 
-# fit <- train(kg ~ ., data = fishTrain,
-#              method = "lm",
-#              trControl = trainControl(method = "cv", number = 10))
-# fit
-# 
-# pred <- predict(fit, newdata = fishTest)
-# postResample(pred,obs = fishTest$kg)
-# 
-# fit2 <- train(kg ~ name + cm + area, data = fishTrain,
-#               method = "lm",
-#               trControl = trainControl(method = "cv", number = 10))
-# 
-# pred <- predict(fit2, newdata = fishTest)
-# postResample(pred,obs = fishTest$kg)
-# fit2
-# data.frame(t(fit$results), t(fit2$results))
-
 # Define server logic
 function(input, output, session) {
-
+  
+  #Get the data for the plots
   getData <- reactive({
     newData <- fishData %>% filter(name == input$fish)
   })
-  
+    #Produce the plots
     output$plot <- renderPlot({
       newData <- getData()
       if (input$plotType == "violin" & input$reg) {
@@ -156,22 +136,36 @@ function(input, output, session) {
       }
     })
     
-    # getTableData <- reactive({
-    #   newData <- fishData %>%  group_by(name) %>% select(name, input$var)
-    # })
-    # 
-    # getGroupTableData <- reactive({
-    #   newData <- fishData %>% filter(name == input$fish) %>% group_by(input$group) %>% select(name, input$var)
-    # })
-    
+    #Produce the data the data table
     table <- reactive({fishData %>%
         select("name", input$group, input$var) %>%
         group_by(name, get(input$group)) %>%
         summarize(summary = get(input$sumType)(get(input$var)))
     })
     
-    
     output$table <- renderDataTable({
       table()
     })
+    
+    #Train and test data
+    trainIndex <- createDataPartition(fishData$kg, p = 0.8, list = FALSE)
+    fishTrain <- fishData[trainIndex, ]
+    fishTest <- fishData[-trainIndex, ]
+    
+    fit <- train(kg ~ ., data = fishTrain,
+                 method = "lm",
+                 trControl = trainControl(method = "cv", number = 10))
+    fit
+    
+    pred <- predict(fit, newdata = fishTest)
+    postResample(pred,obs = fishTest$kg)
+    
+    fit2 <- train(kg ~ name + cm + area, data = fishTrain,
+                  method = "lm",
+                  trControl = trainControl(method = "cv", number = 10))
+    
+    pred <- predict(fit2, newdata = fishTest)
+    postResample(pred,obs = fishTest$kg)
+    fit2
+    data.frame(t(fit$results), t(fit2$results))
 }

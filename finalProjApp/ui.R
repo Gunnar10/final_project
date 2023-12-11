@@ -77,9 +77,29 @@ dashboardPage(
               )
       ),
       tabItem(tabName = "fitModel",
-              fluidRow(
-                box(h1("This is the modeling fitting tab."))
-              )
+                fluidRow(
+                  box(title = "Select the Linear Model's Predictor Variables.",
+                        selectInput(inputId = "regVars",
+                                    label = "Choose Predictors",
+                                    choices = c("name", "subReg",
+                                                "area", "cm", "month"),
+                                    multiple = TRUE
+                                    )
+                      ),
+                  box()
+                ),
+              
+                fluidRow(
+                  box(title = "Select the Random Forest's Predictor Variables.",
+                      selectInput(inputId = "rfVars",
+                                  label = "Choose Predictors",
+                                  choices = c("subReg", "area", 
+                                              "kg", "cm", "month"),
+                                  multiple = TRUE
+                                  )
+                      ),
+                  box()
+                ),
       ),
       tabItem(tabName = "predict",
               fluidRow(
