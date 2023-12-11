@@ -150,7 +150,7 @@ dashboardPage(
                                   min = 0.10,
                                   max = 0.90,
                                   step = 0.10,
-                                  value = 0.5
+                                  value = 0.1
                                   ),
                       selectInput(inputId = "regVars",
                                   label = "Select the Linear Model's Predictor Variables.",
@@ -169,7 +169,7 @@ dashboardPage(
                                    min = 0.10,
                                    max = 0.90,
                                    step = 0.10,
-                                   value = 0.5),
+                                   value = 0.1),
                       
                       selectInput(inputId = "rfVars",
                                     label = "Select the Random Forest's Predictor Variables.",
@@ -182,14 +182,14 @@ dashboardPage(
                                    min = 2,
                                    max = 10,
                                    step = 1,
-                                   value = 5),
+                                   value = 2),
                       
                       sliderInput(inputId = "fold",
                                    label = "Specify the Number of Folds",
                                    min = 2,
                                    max = 10,
                                    step = 1,
-                                   value = 5),
+                                   value = 2),
                       
                       actionButton(inputId = "trainRF", label = "Train the Model")
                   ),
