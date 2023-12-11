@@ -7,15 +7,23 @@ dashboardPage(
   dashboardHeader(title = "Fish App"),
   dashboardSidebar(
     sidebarMenu(
-      menuItem("About", tabName = "about"),
-      menuItem("Data Exploration", tabName = "data"),
-      menuItem("Modeling", tabName = "model")
+                menuItem("About", tabName = "about"),
+                
+                menuItem("Data Exploration", tabName = "data"),
+                
+                menuItem("Modeling", tabName = "model", startExpanded = FALSE,
+                         menuSubItem("Modeling Info", tabName = "infoModel"),
+                         
+                         menuSubItem("Model Fitting", tabName = "fitModel"),
+                         
+                         menuSubItem("Prediction", tabName = "predict")
+                         )
     )
   ),
   dashboardBody(
     tabItems(
       tabItem(tabName = "about",
-              fluidRow(
+              fluidPage(
                 box(h1("This is the about tab."))
               )
       ),
@@ -63,9 +71,19 @@ dashboardPage(
                 )
               )
       ),
-      tabItem(tabName = "model",
+      tabItem(tabName = "infoModel",
               fluidRow(
-                box(h1("This is the modeling tab."))
+                box(h1("This is the modeling information tab."))
+              )
+      ),
+      tabItem(tabName = "fitModel",
+              fluidRow(
+                box(h1("This is the modeling fitting tab."))
+              )
+      ),
+      tabItem(tabName = "predict",
+              fluidRow(
+                box(h1("This is the modeling prediction tab."))
               )
       )
     )
