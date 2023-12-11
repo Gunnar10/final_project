@@ -61,7 +61,7 @@ fishData <- fishData %>%
                                        AREA_X == 4 ~ "offshore",
                                        AREA_X == 5 ~ "inland")),
             kg = WGT, 
-            cm = LNGTH / 10, 
+            cm = LNGTH / 10,
             month = as.factor(case_when(WAVE == 1 ~ "jan/feb",
                                         WAVE == 2 ~ "march/april",
                                         WAVE == 3 ~ "may/june",
@@ -69,6 +69,19 @@ fishData <- fishData %>%
                                         WAVE == 5 ~ "sept/oct",
                                         WAVE == 6 ~ "nov/dec"))
             ) %>% drop_na()
+
+linearModel <- train(kg ~ name + subReg + area + cm + month,
+                   data = fishData,
+                   method = "lm",
+                   trControl = trainControl(method = "cv", number = 10)
+                   )
+
+rfModel <- train(name ~ subReg + area + kg + cm + month,
+               data = fishData,
+               method = "rf",
+               tuneGrid = data.frame(mtry = c(1:5)),
+               trControl = trainControl(method = "cv", number = 10)
+               )
 
 # Define server logic
 function(input, output, session) {
@@ -152,11 +165,11 @@ function(input, output, session) {
                   trainIndex <- createDataPartition(fishData$kg, p = input$trainSplit, list = FALSE)
                       fishTrain <- fishData[trainIndex, ]
                       fishTest <- fishData[-trainIndex, ]
-                          fit <- train(as.formula(paste0("kg ~ ", paste0(input$regVars, collapse = "+"))),
-                                data = fishTrain,
-                                method = "lm",
-                                trControl = trainControl(method = "cv", number = 10)
-                                )
+                          train(as.formula(paste0("kg ~ ", paste0(input$regVars, collapse = "+"))),
+                              data = fishTrain,
+                              method = "lm",
+                              trControl = trainControl(method = "cv", number = 10)
+                              )
                           })
     fitRegTest <- eventReactive(input$train, {
                       trainIndex <- createDataPartition(fishData$kg, p = input$trainSplit, list = FALSE)
@@ -208,4 +221,43 @@ function(input, output, session) {
       list(fitRF(),fitRFTest())
     })
     
+    observeEvent(input$lmPred, {
+
+      nameValue <- as.factor(input$namePred)
+      subRegValue <- as.factor(input$subRegPred)
+      areaValue <- as.factor(input$areaPred)
+      cmValue <- as.numeric(input$cmPred)
+      monthValue <- as.factor(input$monthPred)
+      
+
+      newData <- data.frame(name = nameValue, subReg = subRegValue,
+                            area = areaValue, cm = cmValue, month = monthValue)
+      
+
+      prediction <- predict(linearModel, newdata = newData)
+      
+
+      output$linearPredOutput <- renderPrint({
+        paste("Predicted fish weight in kg:", round(prediction, 2))
+      })
+    })
+    
+    observeEvent(input$rfPred, {
+      
+      subRegValue <- as.factor(input$subRegPredRf)
+      areaValue <- as.factor(input$areaPredRf)
+      kgValue <- as.numeric(input$kgPredRf)
+      cmValue <- as.numeric(input$cmPredRf)
+      monthValue <- as.factor(input$monthPredRf)
+      
+      newData <- data.frame(subReg = subRegValue, area = areaValue,
+                            kg = kgValue, cm = cmValue, month = monthValue)
+      
+      prediction <- predict(rfModel, newdata = newData)
+      
+
+      output$rfPredOutput <- renderPrint({
+        paste("Predicted fish Type:", prediction)
+      })
+    })
 }
