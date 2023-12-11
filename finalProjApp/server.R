@@ -148,24 +148,61 @@ function(input, output, session) {
     })
     
     #Train and test data
-    trainIndex <- createDataPartition(fishData$kg, p = 0.8, list = FALSE)
-    fishTrain <- fishData[trainIndex, ]
-    fishTest <- fishData[-trainIndex, ]
+    fitReg <- eventReactive(input$train, {
+                  trainIndex <- createDataPartition(fishData$kg, p = input$trainSplit, list = FALSE)
+                      fishTrain <- fishData[trainIndex, ]
+                      fishTest <- fishData[-trainIndex, ]
+                          fit <- train(as.formula(paste0("kg ~ ", paste0(input$regVars, collapse = "+"))),
+                                data = fishTrain,
+                                method = "lm",
+                                trControl = trainControl(method = "cv", number = 10)
+                                )
+                          })
+    fitRegTest <- eventReactive(input$train, {
+      trainIndex <- createDataPartition(fishData$kg, p = input$trainSplit, list = FALSE)
+      fishTrain <- fishData[trainIndex, ]
+      fishTest <- fishData[-trainIndex, ]
+      fit <- train(as.formula(paste0("kg ~ ", paste0(input$regVars, collapse = "+"))),
+                   data = fishTrain,
+                   method = "lm",
+                   trControl = trainControl(method = "cv", number = 10)
+      )
+      pred <- predict(fit,fishTest)
+      postResample(pred = pred, fishTest$kg)
+    })
+    output$regTestResults <- renderPrint({
+      list(fitReg(), summary(fitReg()), fitRegTest())
+      
+    })
     
-    fit <- train(kg ~ ., data = fishTrain,
-                 method = "lm",
-                 trControl = trainControl(method = "cv", number = 10))
-    fit
+    fitRF <- eventReactive(input$trainRF, {
+                trainIndex <- createDataPartition(fishData$name, p = input$trainSplitRF, list = FALSE)
+                    fishTrain <- fishData[trainIndex, ]
+                    fishTest <- fishData[-trainIndex, ]
+                        train(as.formula(paste0("name ~ ", paste0(input$rfVars, collapse = "+"))),
+                              data = fishTrain,
+                              method = "rf",
+                              tuneGrid = data.frame(mtry = c(1:5)),
+                              trControl = trainControl(method = "cv", number = 5)
+                              )
+                        })
     
-    pred <- predict(fit, newdata = fishTest)
-    postResample(pred,obs = fishTest$kg)
+    output$rfPlot <- renderPlot({
+      plot(fitRF())
+    })
+    output$rfModel <- renderPrint({
+      fitRF()
+    })
     
-    fit2 <- train(kg ~ name + cm + area, data = fishTrain,
-                  method = "lm",
-                  trControl = trainControl(method = "cv", number = 10))
-    
-    pred <- predict(fit2, newdata = fishTest)
-    postResample(pred,obs = fishTest$kg)
-    fit2
-    data.frame(t(fit$results), t(fit2$results))
+    # pred <- predict(fit, newdata = fishTest)
+    # postResample(pred,obs = fishTest$kg)
+    # 
+    # fit2 <- train(kg ~ name + cm + area, data = fishTrain,
+    #               method = "lm",
+    #               trControl = trainControl(method = "cv", number = 10))
+    # 
+    # pred <- predict(fit2, newdata = fishTest)
+    # postResample(pred,obs = fishTest$kg)
+    # fit2
+    # data.frame(t(fit$results), t(fit2$results))
 }

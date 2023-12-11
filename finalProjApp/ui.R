@@ -78,27 +78,39 @@ dashboardPage(
       ),
       tabItem(tabName = "fitModel",
                 fluidRow(
-                  box(title = "Select the Linear Model's Predictor Variables.",
-                        selectInput(inputId = "regVars",
-                                    label = "Choose Predictors",
-                                    choices = c("name", "subReg",
-                                                "area", "cm", "month"),
-                                    multiple = TRUE
-                                    )
+                  box(numericInput(inputId = "trainSplit",
+                                  label = "Specify the Training Data Percentage",
+                                  min = 0.01,
+                                  max = 0.99,
+                                  value = 0.5
+                                  ),
+                      selectInput(inputId = "regVars",
+                                  label = "Select the Linear Model's Predictor Variables.",
+                                  choices = c("name", "subReg",
+                                              "area", "cm", "month"),
+                                  multiple = TRUE
+                                    ),
+                      actionButton(inputId = "train", label = "Train the Model")
                       ),
-                  box()
+                  box(verbatimTextOutput("regTestResults"))
                 ),
               
                 fluidRow(
-                  box(title = "Select the Random Forest's Predictor Variables.",
+                  box(numericInput(inputId = "trainSplitRF",
+                                   label = "Specify the Training Data Percentage",
+                                   min = 0.01,
+                                   max = 0.99,
+                                   value = 0.5),
                       selectInput(inputId = "rfVars",
-                                  label = "Choose Predictors",
-                                  choices = c("subReg", "area", 
-                                              "kg", "cm", "month"),
-                                  multiple = TRUE
-                                  )
-                      ),
-                  box()
+                                    label = "Select the Random Forest's Predictor Variables.",
+                                    choices = c("subReg", "area",
+                                                "kg", "cm", "month"),
+                                    multiple = TRUE),
+                      actionButton(inputId = "trainRF", label = "Train the Model")
+                  ),
+                  box(verbatimTextOutput("rfModel"),
+                      plotOutput("rfPlot")
+                      )
                 ),
       ),
       tabItem(tabName = "predict",
