@@ -70,7 +70,7 @@ fishData <- fishData %>%
                                         WAVE == 6 ~ "nov/dec"))
             ) %>% drop_na()
 
-linearModel <- train(kg ~ name + subReg + area + cm + month,
+linearModel <- train(log(kg) ~ name + subReg + area + log(cm) + month,
                    data = fishData,
                    method = "lm"
                    )
@@ -90,61 +90,63 @@ function(input, output, session) {
     #Produce the plots
     output$plot <- renderPlot({
       newData <- getData()
-      if (input$plotType == "violin" & input$reg) {
-        
-          ggplot(newData, aes(x =  name, y = kg, fill = subReg)) +
-          labs(
-            title = "Violin Plot of Fish Weight by Fish Type",
-            x = "Fish Type",
-            y = "Weight in kg"
-          ) + geom_violin(trim = FALSE) + labs(fill = "Sub Region")
-        
-      } else if (input$plotType == "violin") {
-        
-        ggplot(newData, aes(x =  name, y = kg)) +
-          labs(
-            title = "Violin Plot of Fish Weight by Fish Type",
-            x = "Fish Type",
-            y = "Weight in kg"
-          ) + geom_violin(trim = FALSE)
-        
-      } else if (input$plotType == "scatter" & input$area) {
-        
-        ggplot(newData, aes(x = cm, y = kg)) + 
-          labs(title = "Scatter Plot of Weights by Length",
-               x = "Length in cm",
-               y = "Weight in kg") +
-          geom_point(aes(colour = area)) +
-          labs(colour = "Area")
-        
-      } else if (input$plotType == "scatter") {
-        
-        ggplot(newData, aes(x = cm, y = kg)) + 
-          labs(title = "Scatter Plot of Weights by Length",
-               x = "Length in cm",
-               y = "Weight in kg") +
-          geom_point()
-        
-      } else if (input$plotType == "bar") {
-        
-        ggplot(newData, aes(x = name, fill = month)) + 
-          labs(title = "Bar Graph of Fish type by Months",
-               x = "Fish Type",
-               y = "Frequency",
-               fill = "Months") + 
-          geom_bar(position = "dodge", colour = "black")
-        
-      } else if (input$plotType == "hist"){
-        
-        ggplot(newData, aes(x = kg)) + 
-          labs(title = "Density plot of Weight for Fish Type",
-               x = "Weight in kg",
-              y = "Frequency") + 
-          geom_histogram(binwidth = input$bin,
-                         colour = "black",
-                         fill = "white")
-      }
-    })
+          withProgress(message = "Producing Plots",{
+                  if (input$plotType == "violin" & input$reg) {
+                    
+                        ggplot(newData, aes(x =  name, y = kg, fill = subReg)) +
+                        labs(
+                          title = "Violin Plot of Fish Weight by Fish Type",
+                          x = "Fish Type",
+                          y = "Weight in kg"
+                        ) + geom_violin(trim = FALSE) + labs(fill = "Sub Region")
+                      
+                    } else if (input$plotType == "violin") {
+                      
+                      ggplot(newData, aes(x =  name, y = kg)) +
+                        labs(
+                          title = "Violin Plot of Fish Weight by Fish Type",
+                          x = "Fish Type",
+                          y = "Weight in kg"
+                        ) + geom_violin(trim = FALSE)
+                      
+                    } else if (input$plotType == "scatter" & input$area) {
+                      
+                      ggplot(newData, aes(x = cm, y = kg)) + 
+                        labs(title = "Scatter Plot of Weights by Length",
+                             x = "Length in cm",
+                             y = "Weight in kg") +
+                        geom_point(aes(colour = area)) +
+                        labs(colour = "Area")
+                      
+                    } else if (input$plotType == "scatter") {
+                      
+                      ggplot(newData, aes(x = cm, y = kg)) + 
+                        labs(title = "Scatter Plot of Weights by Length",
+                             x = "Length in cm",
+                             y = "Weight in kg") +
+                        geom_point()
+                      
+                    } else if (input$plotType == "bar") {
+                      
+                      ggplot(newData, aes(x = name, fill = month)) + 
+                        labs(title = "Bar Graph of Fish type by Months",
+                             x = "Fish Type",
+                             y = "Frequency",
+                             fill = "Months") + 
+                        geom_bar(position = "dodge", colour = "black")
+                      
+                    } else if (input$plotType == "hist"){
+                      
+                      ggplot(newData, aes(x = kg)) + 
+                        labs(title = "Density plot of Weight for Fish Type",
+                             x = "Weight in kg",
+                            y = "Frequency") + 
+                        geom_histogram(binwidth = input$bin,
+                                       colour = "black",
+                                       fill = "white")
+                    }
+            })
+          })
     
     #Produce the data the data table
     table <- reactive({fishData %>%
@@ -182,9 +184,10 @@ function(input, output, session) {
     })
     
     output$regTestResults <- renderPrint({
-      list(fitReg(), summary(fitReg()), fitRegTest())
-      
-    })
+      withProgress(message = "Running Model", {
+        list(fitReg(), summary(fitReg()), fitRegTest())
+        })
+      })
     
     fitRF <- eventReactive(input$trainRF, {
                 trainIndex <- createDataPartition(fishData$name, p = input$trainSplitRF, list = FALSE)
@@ -212,11 +215,16 @@ function(input, output, session) {
     })
     
     output$rfPlot <- renderPlot({
-      plot(fitRF())
-    })
+        withProgress(message = "Rendering Plot", {
+            plot(fitRF())
+          })
+      })
+    
     output$rfModel <- renderPrint({
-      list(fitRF(),fitRFTest())
-    })
+        withProgress(message = "Running Model", {
+            list(fitRF(),fitRFTest())
+          })
+      })
     
     observeEvent(input$lmPred, {
 

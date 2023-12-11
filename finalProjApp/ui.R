@@ -147,10 +147,10 @@ dashboardPage(
                 fluidRow(
                   box(sliderInput(inputId = "trainSplit",
                                   label = "Specify the Training Data Percentage",
-                                  min = 0.10,
-                                  max = 0.90,
-                                  step = 0.10,
-                                  value = 0.1
+                                  min = 0.05,
+                                  max = 0.95,
+                                  step = 0.05,
+                                  value = 0.75
                                   ),
                       selectInput(inputId = "regVars",
                                   label = "Select the Linear Model's Predictor Variables.",
@@ -166,10 +166,10 @@ dashboardPage(
                 fluidRow(
                   box(sliderInput(inputId = "trainSplitRF",
                                    label = "Specify the Training Data Percentage",
-                                   min = 0.10,
-                                   max = 0.90,
-                                   step = 0.10,
-                                   value = 0.1),
+                                   min = 0.05,
+                                   max = 0.95,
+                                   step = 0.05,
+                                   value = 0.75),
                       
                       selectInput(inputId = "rfVars",
                                     label = "Select the Random Forest's Predictor Variables.",
