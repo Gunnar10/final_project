@@ -159,17 +159,18 @@ function(input, output, session) {
                                 )
                           })
     fitRegTest <- eventReactive(input$train, {
-      trainIndex <- createDataPartition(fishData$kg, p = input$trainSplit, list = FALSE)
-      fishTrain <- fishData[trainIndex, ]
-      fishTest <- fishData[-trainIndex, ]
-      fit <- train(as.formula(paste0("kg ~ ", paste0(input$regVars, collapse = "+"))),
-                   data = fishTrain,
-                   method = "lm",
-                   trControl = trainControl(method = "cv", number = 10)
-      )
-      pred <- predict(fit,fishTest)
-      postResample(pred = pred, fishTest$kg)
+                      trainIndex <- createDataPartition(fishData$kg, p = input$trainSplit, list = FALSE)
+                          fishTrain <- fishData[trainIndex, ]
+                          fishTest <- fishData[-trainIndex, ]
+                              fit <- train(as.formula(paste0("kg ~ ", paste0(input$regVars, collapse = "+"))),
+                                         data = fishTrain,
+                                         method = "lm",
+                                         trControl = trainControl(method = "cv", number = 10)
+                                         )
+                              pred <- predict(fit,fishTest)
+                                  postResample(pred = pred, fishTest$kg)
     })
+    
     output$regTestResults <- renderPrint({
       list(fitReg(), summary(fitReg()), fitRegTest())
       
@@ -182,27 +183,29 @@ function(input, output, session) {
                         train(as.formula(paste0("name ~ ", paste0(input$rfVars, collapse = "+"))),
                               data = fishTrain,
                               method = "rf",
-                              tuneGrid = data.frame(mtry = c(1:5)),
-                              trControl = trainControl(method = "cv", number = 5)
+                              tuneGrid = data.frame(mtry = c(1:input$mtry)),
+                              trControl = trainControl(method = "cv", number = input$fold)
                               )
                         })
+    fitRFTest <- eventReactive(input$trainRF, {
+                    trainIndex <- createDataPartition(fishData$name, p = input$trainSplitRF, list = FALSE)
+                        fishTrain <- fishData[trainIndex, ]
+                        fishTest <- fishData[-trainIndex, ]
+                            fit <- train(as.formula(paste0("name ~ ", paste0(input$rfVars, collapse = "+"))),
+                                          data = fishTrain,
+                                          method = "rf",
+                                          tuneGrid = data.frame(mtry = c(1:input$mtry)),
+                                          trControl = trainControl(method = "cv", number = input$fold)
+                                          )
+                            pred <- predict(fit,fishTest)
+                              postResample(pred = pred, fishTest$name)
+    })
     
     output$rfPlot <- renderPlot({
       plot(fitRF())
     })
     output$rfModel <- renderPrint({
-      fitRF()
+      list(fitRF(),fitRFTest())
     })
     
-    # pred <- predict(fit, newdata = fishTest)
-    # postResample(pred,obs = fishTest$kg)
-    # 
-    # fit2 <- train(kg ~ name + cm + area, data = fishTrain,
-    #               method = "lm",
-    #               trControl = trainControl(method = "cv", number = 10))
-    # 
-    # pred <- predict(fit2, newdata = fishTest)
-    # postResample(pred,obs = fishTest$kg)
-    # fit2
-    # data.frame(t(fit$results), t(fit2$results))
 }
