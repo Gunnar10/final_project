@@ -156,31 +156,22 @@ function(input, output, session) {
       }
     })
     
-    getTableData <- reactive({
-      newData <- fishData %>%  group_by(name) %>% select(name, input$var)
+    # getTableData <- reactive({
+    #   newData <- fishData %>%  group_by(name) %>% select(name, input$var)
+    # })
+    # 
+    # getGroupTableData <- reactive({
+    #   newData <- fishData %>% filter(name == input$fish) %>% group_by(input$group) %>% select(name, input$var)
+    # })
+    
+    table <- reactive({fishData %>%
+        select("name", input$group, input$var) %>%
+        group_by(name, get(input$group)) %>%
+        summarize(summary = get(input$sumType)(get(input$var)))
     })
     
-    getGroupTableData <- reactive({
-      newData <- fishData %>% filter(name == input$fish) %>% group_by(input$group) %>% select(name, input$var)
-    })
     
     output$table <- renderDataTable({
-      tableData <- getTableData()
-      groupData <- getGroupTableData()
-      
-      if (input$sumType == "mean") {
-        summary(tableData)
-      } else if (input$sumType == "median") {
-        summary(tableData[ , 2])[3]
-      } else if (input$sumType == "quantiles") {
-        quantile(tableData[ ,2])
-      } else if (input$sumType == "freq") {
-        table(tableData)
-        
-      }
-      
+      table()
     })
-    
-    
-
 }

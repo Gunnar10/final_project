@@ -49,24 +49,14 @@ dashboardPage(
               fluidRow(
                 box(radioButtons(inputId = "sumType", 
                                  label = "Select the Type of Summary.",
-                                 choiceNames = c("Mean", "Median", "Quantiles", "Contingency table"),
-                                 choiceValues = c("mean", "median", "quantiles", "freq")),
-                    selectInput(inputId = "fishTable",
-                                label = "Fish Type",
-                                choices = c("DOLPHIN", "WAHOO", "KING MACKEREL", 
-                                            "SPANISH MACKEREL", "GROUPER", "SPOT",
-                                            "COBIA", "RED SNAPPER")),
+                                 choiceNames = c("Mean", "Median", "Minimum", "Maximum"),
+                                 choiceValues = c("mean", "median", "min", "max")),
                     selectInput(inputId = "var",
                                 label = "Select Variable",
                                 choices = c("kg", "cm")),
-                    
-                    checkboxInput("addGroup", h5("Add Grouping to Table")),
-                    
-                    conditionalPanel(condition = "input.addGroup",
                     selectInput(inputId = "group",
                                 label = "Select Grouping",
                                 choices = c("subReg", "area"))
-                    )
                   ),
                 box(
                   dataTableOutput("table")
