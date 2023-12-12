@@ -92,9 +92,9 @@ dashboardPage(
     tabItems(
       tabItem(tabName = "about",
               fluidPage(
-                img(src = "640x427-Mahimahi-NOAAFisheries.png", height = 100, width = 500),
+                img(src = "640x427-Mahimahi-NOAAFisheries.png", height = 600, width = 600),
                 h1("About"),
-                p("With this app, you can model the weight of a fish in kg with a linear model, and you predict the type of fish caught with a random   forest model. On the data exploration page you can view and update plots and data summaries based on variables the user can select.  On the model Fitting tab on the modeling page you can select the variables to be used in a linear model and a random forest model then you can run the models to obtain performance. On the prediction tab on the modeling page you can select the variable values for a linear and random forest model to obtain predictions."),
+                p("With this app, you can model the weight of a fish in kg with a linear model, and you predict the type of fish caught with a random   forest model. On the data exploration page you can view and update plots and data summaries based on variables the user can select.  On the model Fitting subtab you can select the variables to be used in a linear model and a random forest model then you can run the models to obtain performance. On the prediction subtab you can select the variable values for a linear and random forest model to obtain predictions."),
                 br(),
                 h1("Data"),
                 p("The data used in this app is from the Recreation Fishing Data page on NOAA's website, ", a(href = "https://www.fisheries.noaa.gov/recreational-fishing-data/recreational-fishing-data-downloads", "found here"), ". The file used is the Size data from 2022. The data contains one record per fish caught by the interviewer that took the survey. The variables used in this app are the type of fish, the sub region the fish was caught, the area the fish was caught, the length on the fish in cm, the weight of the fish in kg, and the 2 month range the fish was caught in. Please read the MRIP_Read_Me.pdf and the MRIP_Survey_Variables.xls for more detailed information, both can be ", a(href = "https://www.st.nmfs.noaa.gov/st1/recreational/MRIP_Survey_Data/", "found here"), " along with the .csv files from 2022 used.")
@@ -148,7 +148,8 @@ dashboardPage(
       #Modeling sub tabs.
       tabItem(tabName = "infoModel",
               fluidPage(
-                h1("Model Info Tab")
+                h1("Model Info")
+                p("")
               )
       ),
       #Fitting regression.
