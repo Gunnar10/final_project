@@ -149,7 +149,7 @@ function(input, output, session) {
       table()
     })
     
-    #Train and test data
+    #Train and test linear model
     fitReg <- eventReactive(input$train, {
                   trainIndex <- createDataPartition(fishData$kg, p = input$trainSplit, list = FALSE)
                       fishTrain <- fishData[trainIndex, ]
@@ -178,7 +178,7 @@ function(input, output, session) {
         list(fitReg(), summary(fitReg()), fitRegTest())
         })
       })
-    
+    #train and test rf
     fitRF <- eventReactive(input$trainRF, {
                 trainIndex <- createDataPartition(fishData$name, p = input$trainSplitRF, list = FALSE)
                     fishTrain <- fishData[trainIndex, ]
@@ -215,7 +215,7 @@ function(input, output, session) {
             list(fitRF(),fitRFTest())
           })
       })
-    
+    #Predict with linear model
     observeEvent(input$lmPred, {
         withProgress(message = "Predicting Fish Weight", {
           trainIndex <- createDataPartition(fishData$kg, p = input$predSplit, list = FALSE)
@@ -242,7 +242,7 @@ function(input, output, session) {
             })
           })
       })
-    
+    #Predict with rf
     observeEvent(input$rfPred, {
         withProgress(message = "Predicting Fish Type", {
           rfTrainIndex <- createDataPartition(fishData$name, p = input$predSplitRf, list = FALSE)

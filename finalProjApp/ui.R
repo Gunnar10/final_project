@@ -148,8 +148,15 @@ dashboardPage(
       #Modeling sub tabs.
       tabItem(tabName = "infoModel",
               fluidPage(
-                h1("Model Info")
-                p("")
+                h1("Linear Model"),
+                withMathJax(),
+                h3("\\(y_i = beta_{0,1} + beta_1x_{i,2} + ... + beta_kx_{i,k} + epsilon_i \\)"),
+                br(),
+                p("I fit a linear regression model for predicting the weight of the fish as it is a quantitative response variable which is suited for a linear model. The linear model fits a 'best fit line' the minimizes the sum of squared errors. A good indicator of the model fit is the Root Mean Squared Error.  One drawback of linear models is they are not appropriate for a categorical response variable."),
+                br(),
+                h1("Random Forest"),
+                h3("\\( g(x) = f_0(x) + f_1(x) + f_2(x)...\\)"),
+                p("A random forest is a commonly used machine learning algorithm that combines the output of multiple decision trees to reach a single prediction. Some benefits of the random forest is the reduced risk of overfitting and the accuracy due to multibple decsion trees being used. One downside of using a random forest algorithm is it is a time-consuming process because the algorithm takes a while to compute.")
               )
       ),
       #Fitting regression.
