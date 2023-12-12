@@ -218,54 +218,56 @@ function(input, output, session) {
       })
     
     observeEvent(input$lmPred, {
-        trainIndex <- createDataPartition(fishData$kg, p = input$predSplit, list = FALSE)
-          trainData <- fishData[trainIndex, ]
-            linearModel <- train(kg ~ name + subReg + area + cm + month,
-                                 data = trainData,
-                                 method = "lm"
-                                 )
-      nameValue <- as.factor(input$namePred)
-      subRegValue <- as.factor(input$subRegPred)
-      areaValue <- as.factor(input$areaPred)
-      cmValue <- as.numeric(input$cmPred)
-      monthValue <- as.factor(input$monthPred)
+        withProgress(message = "Predicting Fish Weight", {
+          trainIndex <- createDataPartition(fishData$kg, p = input$predSplit, list = FALSE)
+            trainData <- fishData[trainIndex, ]
+              linearModel <- train(kg ~ name + subReg + area + cm + month,
+                                   data = trainData,
+                                   method = "lm"
+                                   )
+              
+          nameValue <- as.factor(input$namePred)
+          subRegValue <- as.factor(input$subRegPred)
+          areaValue <- as.factor(input$areaPred)
+          cmValue <- as.numeric(input$cmPred)
+          monthValue <- as.factor(input$monthPred)
       
-      newData <- data.frame(name = nameValue, subReg = subRegValue,
+          newData <- data.frame(name = nameValue, subReg = subRegValue,
                             area = areaValue, cm = cmValue, month = monthValue)
       
-      prediction <- predict(linearModel, newdata = newData)
+          prediction <- predict(linearModel, newdata = newData)
       
 
-      output$linearPredOutput <- renderPrint({
-          withProgress(message = "Predicting Fish Weight", {
+          output$linearPredOutput <- renderPrint({
               paste("Predicted fish weight in kg:", round(prediction, 2))
             })
-        })
+          })
       })
     
     observeEvent(input$rfPred, {
-        rfTrainIndex <- createDataPartition(fishData$name, p = input$predSplitRf, list = FALSE)
-          rfTrainData <- fishData[rfTrainIndex, ]
-            rfModel <- train(name ~ subReg + area + kg + cm + month,
-                             data = rfTrainData,
-                             method = "rf"
-                             )
-      subRegValue <- as.factor(input$subRegPredRf)
-      areaValue <- as.factor(input$areaPredRf)
-      kgValue <- as.numeric(input$kgPredRf)
-      cmValue <- as.numeric(input$cmPredRf)
-      monthValue <- as.factor(input$monthPredRf)
-      
-      newData <- data.frame(subReg = subRegValue, area = areaValue,
-                            kg = kgValue, cm = cmValue, month = monthValue)
-      
-      prediction <- predict(rfModel, newdata = newData)
-      
-
-      output$rfPredOutput <- renderPrint({
-          withProgress(message = "Predicting Fish Type", {
-              paste("Predicted fish Type:", prediction)
+        withProgress(message = "Predicting Fish Type", {
+          rfTrainIndex <- createDataPartition(fishData$name, p = input$predSplitRf, list = FALSE)
+              rfTrainData <- fishData[rfTrainIndex, ]
+                rfModel <- train(name ~ subReg + area + kg + cm + month,
+                                 data = rfTrainData,
+                                 method = "rf"
+                            )
+                
+          subRegValue <- as.factor(input$subRegPredRf)
+          areaValue <- as.factor(input$areaPredRf)
+          kgValue <- as.numeric(input$kgPredRf)
+          cmValue <- as.numeric(input$cmPredRf)
+          monthValue <- as.factor(input$monthPredRf)
+           
+          newData <- data.frame(subReg = subRegValue, area = areaValue,
+                                 kg = kgValue, cm = cmValue, month = monthValue)
+           
+          prediction <- predict(rfModel, newdata = newData)
+           
+           
+          output$rfPredOutput <- renderPrint({
+             paste("Predicted fish Type:", prediction)
             })
-        })
-      })
+       })
+    })
 }
