@@ -3,14 +3,15 @@ library(shiny)
 library(shinydashboard)
 library(tidyverse)
 library(caret)
+library(randomForest)
 
 #read in the Data
-data_1 <- read_csv("size_20221.csv")
-data_2 <- read_csv("size_20222.csv")
-data_3 <- read_csv("size_20223.csv")
-data_4 <- read_csv("size_20224.csv")
-data_5 <- read_csv("size_20225.csv")
-data_6 <- read_csv("size_20226.csv")
+data_1 <- read_csv("size_20221.csv", show_col_types = FALSE)
+data_2 <- read_csv("size_20222.csv", show_col_types = FALSE)
+data_3 <- read_csv("size_20223.csv", show_col_types = FALSE)
+data_4 <- read_csv("size_20224.csv", show_col_types = FALSE)
+data_5 <- read_csv("size_20225.csv", show_col_types = FALSE)
+data_6 <- read_csv("size_20226.csv", show_col_types = FALSE)
 
 #Clean the data
 data_1 <- data_1 %>% 
@@ -69,16 +70,6 @@ fishData <- fishData %>%
                                         WAVE == 5 ~ "sept/oct",
                                         WAVE == 6 ~ "nov/dec"))
             ) %>% drop_na()
-
-linearModel <- train(log(kg) ~ name + subReg + area + log(cm) + month,
-                   data = fishData,
-                   method = "lm"
-                   )
-
-rfModel <- train(name ~ subReg + area + kg + cm + month,
-               data = fishData,
-               method = "rf"
-               )
 
 # Define server logic
 function(input, output, session) {
@@ -221,34 +212,44 @@ function(input, output, session) {
       })
     
     output$rfModel <- renderPrint({
-        withProgress(message = "Running Model", {
+        withProgress(message = "Running Random Forest Model", {
             list(fitRF(),fitRFTest())
           })
       })
     
     observeEvent(input$lmPred, {
-
+        trainIndex <- createDataPartition(fishData$kg, p = input$predSplit, list = FALSE)
+          trainData <- fishData[trainIndex, ]
+            linearModel <- train(kg ~ name + subReg + area + cm + month,
+                                 data = trainData,
+                                 method = "lm"
+                                 )
       nameValue <- as.factor(input$namePred)
       subRegValue <- as.factor(input$subRegPred)
       areaValue <- as.factor(input$areaPred)
       cmValue <- as.numeric(input$cmPred)
       monthValue <- as.factor(input$monthPred)
       
-
       newData <- data.frame(name = nameValue, subReg = subRegValue,
                             area = areaValue, cm = cmValue, month = monthValue)
       
-
       prediction <- predict(linearModel, newdata = newData)
       
 
       output$linearPredOutput <- renderPrint({
-        paste("Predicted fish weight in kg:", round(prediction, 2))
+          withProgress(message = "Predicting Fish Weight", {
+              paste("Predicted fish weight in kg:", round(prediction, 2))
+            })
+        })
       })
-    })
     
     observeEvent(input$rfPred, {
-      
+        rfTrainIndex <- createDataPartition(fishData$name, p = input$predSplitRf, list = FALSE)
+          rfTrainData <- fishData[rfTrainIndex, ]
+            rfModel <- train(name ~ subReg + area + kg + cm + month,
+                             data = rfTrainData,
+                             method = "rf"
+                             )
       subRegValue <- as.factor(input$subRegPredRf)
       areaValue <- as.factor(input$areaPredRf)
       kgValue <- as.numeric(input$kgPredRf)
@@ -262,7 +263,9 @@ function(input, output, session) {
       
 
       output$rfPredOutput <- renderPrint({
-        paste("Predicted fish Type:", prediction)
+          withProgress(message = "Predicting Fish Type", {
+              paste("Predicted fish Type:", prediction)
+            })
+        })
       })
-    })
 }

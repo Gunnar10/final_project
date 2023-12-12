@@ -4,37 +4,37 @@ library(shinydashboard)
 library(tidyverse)
 
 #read in the Data
-data_1 <- read_csv("size_20221.csv")
-data_2 <- read_csv("size_20222.csv")
-data_3 <- read_csv("size_20223.csv")
-data_4 <- read_csv("size_20224.csv")
-data_5 <- read_csv("size_20225.csv")
-data_6 <- read_csv("size_20226.csv")
+data_1 <- read_csv("size_20221.csv", show_col_types = FALSE)
+data_2 <- read_csv("size_20222.csv", show_col_types = FALSE)
+data_3 <- read_csv("size_20223.csv", show_col_types = FALSE)
+data_4 <- read_csv("size_20224.csv", show_col_types = FALSE)
+data_5 <- read_csv("size_20225.csv", show_col_types = FALSE)
+data_6 <- read_csv("size_20226.csv", show_col_types = FALSE)
 
 #Clean the data
-data_1 <- data_1 %>% 
+data_1 <- data_1 %>%
   select(common, SUB_REG, AREA_X, WGT, wgt_imp, LNGTH, lngth_imp, WAVE)
 
-data_2 <- data_2 %>% 
+data_2 <- data_2 %>%
   select(common, SUB_REG, AREA_X, WGT, wgt_imp, LNGTH, lngth_imp, WAVE)
 
-data_3 <- data_3 %>% 
+data_3 <- data_3 %>%
   select(common, SUB_REG, AREA_X, WGT, wgt_imp, LNGTH, lngth_imp, WAVE)
 
-data_4 <- data_4 %>% 
+data_4 <- data_4 %>%
   select(common, SUB_REG, AREA_X, WGT, wgt_imp, LNGTH, lngth_imp, WAVE)
 
-data_5 <- data_5 %>% 
+data_5 <- data_5 %>%
   select(common, SUB_REG, AREA_X, WGT, wgt_imp, LNGTH, lngth_imp, WAVE)
 
-data_6 <- data_6 %>% 
+data_6 <- data_6 %>%
   select(common, SUB_REG, AREA_X, WGT, wgt_imp, LNGTH, lngth_imp, WAVE)
 
 fishData <- rbind(data_1, data_2, data_3, data_4, data_5, data_6) %>%
-  filter(common %in% c("DOLPHIN", "WAHOO", "KING MACKEREL", 
-                       "SPANISH MACKEREL", "GAG", "BLACK GROUPER", 
-                       "RED GROUPER", "SPOT", "COBIA", "RED SNAPPER") & 
-           wgt_imp == 0 & 
+  filter(common %in% c("DOLPHIN", "WAHOO", "KING MACKEREL",
+                       "SPANISH MACKEREL", "GAG", "BLACK GROUPER",
+                       "RED GROUPER", "SPOT", "COBIA", "RED SNAPPER") &
+           wgt_imp == 0 &
            lngth_imp == 0)
 
 fishData <- fishData %>%
@@ -48,18 +48,18 @@ fishData <- fishData %>%
                                        common == "SPOT" ~ "SPOT",
                                        common == "COBIA" ~ "COBIA",
                                        common == "RED SNAPPER" ~ "RED SNAPPER")),
-            
+
             subReg = as.factor(case_when(SUB_REG == 4 ~ "north atlantic",
                                          SUB_REG == 5 ~ "mid atlantic",
                                          SUB_REG == 6 ~ "south atlantic",
                                          SUB_REG == 7 ~ "gulf")),
-            
+
             area = as.factor(case_when(AREA_X == 1 ~ "inshore",
                                        AREA_X == 2 ~ "offshore",
                                        AREA_X == 3 ~ "inshore",
                                        AREA_X == 4 ~ "offshore",
                                        AREA_X == 5 ~ "inland")),
-            kg = WGT, 
+            kg = WGT,
             cm = round(LNGTH / 10, 0),
             month = as.factor(case_when(WAVE == 1 ~ "jan/feb",
                                         WAVE == 2 ~ "march/april",
@@ -71,7 +71,7 @@ fishData <- fishData %>%
 
 # Define UI for application
 dashboardPage(
-  dashboardHeader(title = "Fish App"),
+  dashboardHeader(title = "Fish Prediction App"),
   dashboardSidebar(
     sidebarMenu(
                 menuItem("About", tabName = "about"),
@@ -202,7 +202,7 @@ dashboardPage(
       
       tabItem(tabName = "predict",
               fluidRow(
-                box("Select the input variables for the Linear Model",
+                box("Select the input values for the Linear Model",
                     selectInput(inputId = "namePred",
                                 label = "Fish Type",
                                 choices = unique(fishData$name)
@@ -217,12 +217,18 @@ dashboardPage(
                                 ),
                     selectInput(inputId = "cmPred",
                                 label = "Lenght in cm",
-                                choices = unique(fishData$cm)
+                                choices = c(1:180)
                                 ),
                     selectInput(inputId = "monthPred",
                                 label = "Months",
                                 choices = unique(fishData$month)
                                 ),
+                    sliderInput(inputId = "predSplit",
+                                label = "Specify Training Data Split",
+                                min = 0.05,
+                                max = 0.95,
+                                step = 0.05,
+                                value = 0.75),
                     actionButton("lmPred", "Predict Fish Weight")
                     ),
                 box("Select the input values for the Random Forest",
@@ -236,16 +242,22 @@ dashboardPage(
                     ),
                     selectInput(inputId = "kgPredRf",
                                 label = "Weight in kg",
-                                choices = unique(fishData$kg)
+                                choices = seq(from = 0, to = 40, by = 0.25)
                                 ),
                     selectInput(inputId = "cmPredRf",
                                 label = "Lenght in cm",
-                                choices = unique(fishData$cm)
+                                choices = c(1:180)
                     ),
                     selectInput(inputId = "monthPredRf",
                                 label = "Months",
                                 choices = unique(fishData$month)
                     ),
+                    sliderInput(inputId = "predSplitRf",
+                                label = "Specify Training Data Split",
+                                min = 0.05,
+                                max = 0.95,
+                                step = 0.05,
+                                value = 0.75),
                     actionButton("rfPred", "Predict Fish Type")
                     ),
                 box(verbatimTextOutput("linearPredOutput"),
