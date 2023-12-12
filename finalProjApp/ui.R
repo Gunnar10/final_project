@@ -1,3 +1,7 @@
+#Fish Prediction App_UI
+#Author: Jacob Press
+#Date: 11/12/2023
+
 #Load packages
 library(shiny)
 library(shinydashboard)
