@@ -3,7 +3,6 @@ library(shiny)
 library(shinydashboard)
 library(tidyverse)
 library(caret)
-library(randomForest)
 
 #read in the Data
 data_1 <- read_csv("size_20221.csv", show_col_types = FALSE)
