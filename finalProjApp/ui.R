@@ -73,11 +73,12 @@ fishData <- fishData %>%
 dashboardPage(
   dashboardHeader(title = "Fish Prediction App"),
   dashboardSidebar(
+    #Create Tabs.
     sidebarMenu(
                 menuItem("About", tabName = "about"),
                 
                 menuItem("Data Exploration", tabName = "data"),
-                
+                #create subtabs.
                 menuItem("Modeling", tabName = "model", startExpanded = FALSE,
                          menuSubItem("Modeling Info", tabName = "infoModel"),
                          
@@ -91,9 +92,15 @@ dashboardPage(
     tabItems(
       tabItem(tabName = "about",
               fluidPage(
-                box(h1("This is the about tab."))
-              )
+                img(src = "640x427-Mahimahi-NOAAFisheries.png", height = 100, width = 500),
+                h1("About"),
+                p("With this app, you can model the weight of a fish in kg with a linear model, and you predict the type of fish caught with a random   forest model. On the data exploration page you can view and update plots and data summaries based on variables the user can select.  On the model Fitting tab on the modeling page you can select the variables to be used in a linear model and a random forest model then you can run the models to obtain performance. On the prediction tab on the modeling page you can select the variable values for a linear and random forest model to obtain predictions."),
+                br(),
+                h1("Data"),
+                p("The data used in this app is from the Recreation Fishing Data page on NOAA's website, ", a(href = "https://www.fisheries.noaa.gov/recreational-fishing-data/recreational-fishing-data-downloads", "found here"), ". The file used is the Size data from 2022. The data contains one record per fish caught by the interviewer that took the survey. The variables used in this app are the type of fish, the sub region the fish was caught, the area the fish was caught, the length on the fish in cm, the weight of the fish in kg, and the 2 month range the fish was caught in. Please read the MRIP_Read_Me.pdf and the MRIP_Survey_Variables.xls for more detailed information, both can be ", a(href = "https://www.st.nmfs.noaa.gov/st1/recreational/MRIP_Survey_Data/", "found here"), " along with the .csv files from 2022 used.")
+                )
       ),
+      #EDA Tab.
       tabItem(tabName = "data",
               fluidRow(
                 box(radioButtons(inputId = "plotType", 
@@ -138,11 +145,13 @@ dashboardPage(
                 )
               )
       ),
+      #Modeling sub tabs.
       tabItem(tabName = "infoModel",
-              fluidRow(
-                box(h1("This is the modeling information tab."))
+              fluidPage(
+                h1("Model Info Tab")
               )
       ),
+      #Fitting regression.
       tabItem(tabName = "fitModel",
                 fluidRow(
                   box(sliderInput(inputId = "trainSplit",
@@ -162,7 +171,7 @@ dashboardPage(
                       ),
                   box(verbatimTextOutput("regTestResults"))
                 ),
-              
+              #Fitting Random Forest.
                 fluidRow(
                   box(sliderInput(inputId = "trainSplitRF",
                                    label = "Specify the Training Data Percentage",
@@ -199,67 +208,83 @@ dashboardPage(
                       )
                   )
               ),
-      
+      #prediction tab.
       tabItem(tabName = "predict",
               fluidRow(
                 box("Select the input values for the Linear Model",
+                    #Select fish var.
                     selectInput(inputId = "namePred",
                                 label = "Fish Type",
                                 choices = unique(fishData$name)
                                 ),
+                    #select Region Var.
                     selectInput(inputId = "subRegPred",
                                 label = "Sub Region",
                                 choices = unique(fishData$subReg)
                                 ),
+                    #select Area var.
                     selectInput(inputId = "areaPred",
                                 label = "Area",
                                 choices = unique(fishData$area)
                                 ),
-                    selectInput(inputId = "cmPred",
-                                label = "Lenght in cm",
-                                choices = c(1:180)
-                                ),
+                    #select length var.
+                    numericInput(inputId = "cmPred",
+                                 label = "Lenght in cm",
+                                 value = 50
+                                 ),
+                    #Select month var.
                     selectInput(inputId = "monthPred",
                                 label = "Months",
                                 choices = unique(fishData$month)
                                 ),
+                    #select training data split.
                     sliderInput(inputId = "predSplit",
                                 label = "Specify Training Data Split",
                                 min = 0.05,
                                 max = 0.95,
                                 step = 0.05,
                                 value = 0.75),
+                    #button to run the model
                     actionButton("lmPred", "Predict Fish Weight")
                     ),
+                #Select variables for rf.
                 box("Select the input values for the Random Forest",
+                    #select region var.
                     selectInput(inputId = "subRegPredRf",
                                 label = "Sub Region",
                                 choices = unique(fishData$subReg)
                     ),
+                    #Select area var.
                     selectInput(inputId = "areaPredRf",
                                 label = "Area",
                                 choices = unique(fishData$area)
                     ),
-                    selectInput(inputId = "kgPredRf",
-                                label = "Weight in kg",
-                                choices = seq(from = 0, to = 40, by = 0.25)
-                                ),
-                    selectInput(inputId = "cmPredRf",
-                                label = "Lenght in cm",
-                                choices = c(1:180)
-                    ),
+                    #select weight var.
+                    numericInput(inputId = "kgPredRf",
+                                 label = "Weight in kg",
+                                 value = 10
+                                 ),
+                    #Select length var.
+                    numericInput(inputId = "cmPredRf",
+                                 label = "Lenght in cm",
+                                 value = 50
+                                 ),
+                    #Select month var.
                     selectInput(inputId = "monthPredRf",
                                 label = "Months",
                                 choices = unique(fishData$month)
                     ),
+                    #select training data split.
                     sliderInput(inputId = "predSplitRf",
                                 label = "Specify Training Data Split",
                                 min = 0.05,
                                 max = 0.95,
                                 step = 0.05,
                                 value = 0.75),
+                    #button to run rf.
                     actionButton("rfPred", "Predict Fish Type")
                     ),
+                #Output.
                 box(verbatimTextOutput("linearPredOutput"),
                     verbatimTextOutput("rfPredOutput")
                     )
