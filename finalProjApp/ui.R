@@ -166,7 +166,8 @@ dashboardPage(
       #Fitting regression.
       tabItem(tabName = "fitModel",
                 fluidRow(
-                  box(sliderInput(inputId = "trainSplit",
+                  box(title = "Linear model",
+                    sliderInput(inputId = "trainSplit",
                                   label = "Specify the Training Data Percentage",
                                   min = 0.05,
                                   max = 0.95,
@@ -185,7 +186,8 @@ dashboardPage(
                 ),
               #Fitting Random Forest.
                 fluidRow(
-                  box(sliderInput(inputId = "trainSplitRF",
+                  box(title = "Random Forest",
+                    sliderInput(inputId = "trainSplitRF",
                                    label = "Specify the Training Data Percentage",
                                    min = 0.05,
                                    max = 0.95,
@@ -223,7 +225,7 @@ dashboardPage(
       #prediction tab.
       tabItem(tabName = "predict",
               fluidRow(
-                box("Select the input values for the Linear Model",
+                box(title = "Select the input values for the Linear Model",
                     #Select fish var.
                     selectInput(inputId = "namePred",
                                 label = "Fish Type",
@@ -260,7 +262,7 @@ dashboardPage(
                     actionButton("lmPred", "Predict Fish Weight")
                     ),
                 #Select variables for rf.
-                box("Select the input values for the Random Forest",
+                box(title = "Select the input values for the Random Forest",
                     #select region var.
                     selectInput(inputId = "subRegPredRf",
                                 label = "Sub Region",

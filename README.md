@@ -4,7 +4,7 @@ I created a fish prediction app that has some EDA on certain fish caught on the 
 
 Please paste this code into the console of RStudio to install all the necessary packages used in the app:  
 
-`install.packages(c("shiny", "shinydashboard", "tidyverse", "caret"))`
+`install.packages(c("shiny", "shinydashboard", "tidyverse", "caret", "randomForest"))`
 
 Please paste this code into the console of RStudio to run the app:  
 

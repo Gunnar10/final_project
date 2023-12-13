@@ -8,6 +8,7 @@ library(shiny)
 library(shinydashboard)
 library(tidyverse)
 library(caret)
+library(randomForest)
 
 #read in the Data
 data_1 <- read_csv("size_20221.csv", show_col_types = FALSE)
@@ -210,7 +211,7 @@ function(input, output, session) {
     })
     
     output$rfPlot <- renderPlot({
-        withProgress(message = "Rendering Plot", {
+        withProgress(message = "Running Random Forest Model", {
             plot(fitRF())
           })
       })
